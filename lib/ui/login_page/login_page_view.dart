@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nsbm_navi_clear/theme/styled_colors.dart';
+import 'package:nsbm_navi_clear/ui/home_page/home_page_view.dart';
 import 'package:nsbm_navi_clear/ui/signup_page/signup_page_view.dart';
 import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
 import 'package:nsbm_navi_clear/util/assets.dart';
@@ -113,6 +114,10 @@ class _LoginPageViewState extends State<LoginPageView> {
       final email = (emailCtrl.text).trim();
       final password = (passCtrl.text).trim();
       if (EmailValidator.validate(email)) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePageView()),
+        );
       } else {
         return;
       }

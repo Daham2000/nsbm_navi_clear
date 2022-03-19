@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class CategoryView extends StatefulWidget {
-  const CategoryView({Key? key}) : super(key: key);
+class FavouriteView extends StatefulWidget {
+  const FavouriteView({Key? key}) : super(key: key);
 
   @override
-  State<CategoryView> createState() => _CategoryViewState();
+  State<FavouriteView> createState() => _FavouriteViewState();
 }
 
-class _CategoryViewState extends State<CategoryView> {
+class _FavouriteViewState extends State<FavouriteView> {
   Container getCategory(BuildContext context, String img, String text) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
@@ -71,14 +71,6 @@ class _CategoryViewState extends State<CategoryView> {
                   "wp-content/uploads/2016/05/soc-Security-Operations-Center."
                   "png?resize=300185",
               "NSBM - SOC"),
-          getCategory(
-              context,
-              "https://www.onegalleface.com/wp-content/themes/ogf/img/intro-image.jpg",
-              "One Galle Face"),
-          getCategory(
-              context,
-              "https://www.csth.health.gov.lk/wp-content/uploads/2015/07/DSC03113-e1492752901317.jpg",
-              "Colombo South Teaching Hospital"),
         ],
       ),
     );

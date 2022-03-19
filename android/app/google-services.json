@@ -29,6 +29,13 @@
             {
               "client_id": "363552371058-muapqfdcrkg6tfpug04oa9gr24u2k58i.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "363552371058-k9euq2002m7d08mtpddb0tbakmk1ms2s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nsbm.naviclear.nsbmNaviClear"
+              }
             }
           ]
         }

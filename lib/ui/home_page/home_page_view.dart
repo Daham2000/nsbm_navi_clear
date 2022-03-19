@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nsbm_navi_clear/db/auth.dart';
 import 'package:nsbm_navi_clear/theme/styled_colors.dart';
 import 'package:nsbm_navi_clear/ui/home_page/sub_pages/category_view.dart';
 import 'package:nsbm_navi_clear/ui/home_page/sub_pages/favourite_view.dart';
@@ -64,6 +65,7 @@ class _HomePageViewState extends State<HomePageView> {
           actions: [
             _selectedIndex != 0 ? GestureDetector(
                 onTap: () {
+                  Auth().logout();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -101,7 +103,7 @@ class _HomePageViewState extends State<HomePageView> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Person',
+            label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,

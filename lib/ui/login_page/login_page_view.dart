@@ -249,7 +249,23 @@ class _LoginPageViewState extends State<LoginPageView> {
                         backgroundColor: MaterialStateProperty.all<Color>(
                             StyledColor.googleBtn),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        final UserCredential? result =
+                            await Auth().signInWithGoogle();
+                        if (result?.user != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomePageView()),
+                          );
+                        }
+                        setState(() {
+                          isLoading = false;
+                        });
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

@@ -1,4 +1,5 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nsbm_navi_clear/theme/styled_colors.dart';
@@ -6,6 +7,8 @@ import 'package:nsbm_navi_clear/ui/home_page/home_page_view.dart';
 import 'package:nsbm_navi_clear/ui/signup_page/signup_page_view.dart';
 import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
 import 'package:nsbm_navi_clear/util/assets.dart';
+
+import '../../db/auth.dart';
 
 class LoginPageView extends StatefulWidget {
   const LoginPageView({Key? key}) : super(key: key);
@@ -20,9 +23,21 @@ class _LoginPageViewState extends State<LoginPageView> {
   String password = "";
   final _formKey = GlobalKey<FormState>();
   final passCtrl = TextEditingController();
+  bool isLoading = false;
+
+  checkAlreadyLoggedIn()async{
+    final User? user = await Auth().getLoggedUser();
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePageView()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+
     final emailField = TextFormField(
       controller: emailCtrl,
       validator: (value) {
@@ -114,10 +129,20 @@ class _LoginPageViewState extends State<LoginPageView> {
       final email = (emailCtrl.text).trim();
       final password = (passCtrl.text).trim();
       if (EmailValidator.validate(email)) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePageView()),
-        );
+        setState(() {
+          isLoading = true;
+        });
+        UserCredential? result =
+            await Auth().emailPasswordLogin(email, password);
+        setState(() {
+          isLoading = false;
+        });
+        if (result.user != null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePageView()),
+          );
+        }
       } else {
         return;
       }
@@ -133,143 +158,150 @@ class _LoginPageViewState extends State<LoginPageView> {
           leadingWidth: 110,
           elevation: 0,
           leading: const AppBarLogo()),
-      body: Scrollbar(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(
-              height: 50,
-            ),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(right: 20, left: 20),
-                    child: Text(
-                      "SignIn to the system",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20, left: 20),
-                    child: emailField,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20, left: 20),
-                    child: passwordField,
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 0),
-                    child: SizedBox(
-                      height: 50.0,
-                      width: MediaQuery.of(context).size.width,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState != null) {
-                            if (_formKey.currentState!.validate()) {
-                              _loginClicked();
-                            }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: StyledColor.blurPrimary,
-                          onPrimary: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: StyledColor.blurPrimary,
+              ),
+            )
+          : ListView(
+              children: [
+                const SizedBox(
+                  height: 50,
+                ),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(right: 20, left: 20),
+                        child: Text(
+                          "SignIn to the system",
+                          style: TextStyle(fontSize: 20),
                         ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: "Mulish"),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20, left: 20),
+                        child: emailField,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20, left: 20),
+                        child: passwordField,
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 0),
+                        child: SizedBox(
+                          height: 50.0,
+                          width: MediaQuery.of(context).size.width,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState != null) {
+                                if (_formKey.currentState!.validate()) {
+                                  _loginClicked();
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: StyledColor.blurPrimary,
+                              onPrimary: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: "Mulish"),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                  child: Text(
+                    "Or",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20, left: 20),
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            StyledColor.googleBtn),
+                      ),
+                      onPressed: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: () {},
+                              child: Image.asset(
+                                Assets.google,
+                                color: Colors.white,
+                                height: 20,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Text(
+                                "SignIn with google",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.mulish(
+                                    color: Colors.white,
+                                    textStyle: const TextStyle(fontSize: 13)),
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 10),
-              child: Text(
-                "Or",
-                style: TextStyle(fontSize: 14),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 20, left: 20),
-              child: SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(StyledColor.googleBtn),
-                  ),
-                  onPressed: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: Image.asset(
-                            Assets.google,
-                            color: Colors.white,
-                            height: 20,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text(
-                            "SignIn with google",
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.mulish(
-                                color: Colors.white,
-                                textStyle: const TextStyle(fontSize: 13)),
-                          ),
-                        )
-                      ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignUpPageView()),
+                    );
+                  },
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    child: Text(
+                      "Don't you have a account? Signup",
+                      style: TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(
-              height: 5,
-            ),
-            InkWell(
-              onTap: (){
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignUpPageView()),
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 10.0),
-                child: Text(
-                  "Don't you have a account? Signup",
-                  style: TextStyle(fontSize: 14),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

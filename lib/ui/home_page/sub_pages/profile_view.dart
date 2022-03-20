@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nsbm_navi_clear/db/auth.dart';
 import 'package:nsbm_navi_clear/db/model/profile.dart';
 import 'package:nsbm_navi_clear/db/profile_api.dart';
+import 'package:nsbm_navi_clear/theme/styled_colors.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -30,14 +32,22 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future getImage() async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
     final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 100,
         maxWidth: 300,
         maxHeight: 300);
     try {
-      if(pickedFile!=null){
+      if (pickedFile != null) {
         _image = File(pickedFile.path);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Your image is uploading...'),
+          backgroundColor: StyledColor.blurPrimary,
+        ));
+        await ProfileApi().uploadImage(_image, context);
+        getUser();
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
       }
     } catch (e) {
       print(e);
@@ -48,12 +58,12 @@ class _ProfileViewState extends State<ProfileView> {
     final User? loggedUser = await Auth().getLoggedUser();
     final Profile user = await ProfileApi().getUser(loggedUser?.email);
     setState(() {
-      if(user.profilePicture!=""){
+      if (user.profilePicture != "") {
         profileImg = user.profilePicture;
       }
       name = user.displayName;
       _controller.text = name;
-      email= user.email;
+      email = user.email;
     });
   }
 
@@ -67,35 +77,37 @@ class _ProfileViewState extends State<ProfileView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                onTap: (){
-                  showModalBottomSheet(context: context, builder: (builder) {
-                    return Container(
-                      color: Colors.white,
-                      height: MediaQuery.of(context).size.height*0.1,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: InkWell(
-                        onTap: (){
-                          Navigator.pop(context);
-                          getImage();
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: const [
-                            Icon(Icons.person),
-                            SizedBox(width: 10,),
-                            Text("Change profile picture"),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (builder) {
+                        return Container(
+                          color: Colors.white,
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                              getImage();
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: const [
+                                Icon(Icons.person),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text("Change profile picture"),
+                              ],
+                            ),
+                          ),
+                        );
+                      });
                 },
                 child: ClipOval(
                   child: SizedBox.fromSize(
                     size: const Size.fromRadius(60), // Image radius
-                    child: Image.network(
-                        profileImg,
-                        fit: BoxFit.cover),
+                    child: Image.network(profileImg, fit: BoxFit.cover),
                   ),
                 ),
               ),

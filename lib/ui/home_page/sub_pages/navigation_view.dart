@@ -13,8 +13,8 @@ class _NavigationViewState extends State<NavigationView> {
     return ListView(
       children: [
         Row(
-          children: const [
-            SizedBox(
+          children:  [
+            const SizedBox(
               width: 120,
               child: Padding(
                 padding:
@@ -26,9 +26,9 @@ class _NavigationViewState extends State<NavigationView> {
               ),
             ),
             SizedBox(
-              width: 260,
+              width: MediaQuery.of(context).size.width*0.6,
               height: 40,
-              child: TextField(
+              child: const TextField(
                   decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12.0)),
@@ -41,8 +41,8 @@ class _NavigationViewState extends State<NavigationView> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 15.0),
           child: Row(
-            children: const [
-              SizedBox(
+            children: [
+              const SizedBox(
                 width: 120,
                 child: Padding(
                   padding:
@@ -54,9 +54,9 @@ class _NavigationViewState extends State<NavigationView> {
                 ),
               ),
               SizedBox(
-                width: 260,
+                width: MediaQuery.of(context).size.width*0.6,
                 height: 40,
-                child: TextField(
+                child: const TextField(
                     decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),

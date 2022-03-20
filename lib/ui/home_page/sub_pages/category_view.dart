@@ -67,17 +67,15 @@ class _CategoryViewState extends State<CategoryView> {
         children: [
           getCategory(
               context,
-              "http://i1.wp.com/securityaffairs.co/wordpress/"
-                  "wp-content/uploads/2016/05/soc-Security-Operations-Center."
-                  "png?resize=300185",
+              "https://firebasestorage.googleapis.com/v0/b/navi-clear.appspot.com/o/1212.jpeg?alt=media&token=84c25d6d-8238-4a93-b888-0703f4bbd6f8",
               "NSBM - SOC"),
           getCategory(
               context,
-              "https://www.onegalleface.com/wp-content/themes/ogf/img/intro-image.jpg",
+              "https://firebasestorage.googleapis.com/v0/b/navi-clear.appspot.com/o/intro-image.jpeg?alt=media&token=fe313b7f-40c1-493c-98e7-2878f154c6d4",
               "One Galle Face"),
           getCategory(
               context,
-              "https://www.csth.health.gov.lk/wp-content/uploads/2015/07/DSC03113-e1492752901317.jpg",
+              "https://firebasestorage.googleapis.com/v0/b/navi-clear.appspot.com/o/DSC03113-e1492752901317.jpeg?alt=media&token=bc2f42d9-4a79-4db9-ad65-d3bc9ef4abd8",
               "Colombo South Teaching Hospital"),
         ],
       ),

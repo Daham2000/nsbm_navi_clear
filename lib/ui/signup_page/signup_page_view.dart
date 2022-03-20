@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nsbm_navi_clear/db/auth.dart';
+import 'package:nsbm_navi_clear/db/model/profile.dart';
 import 'package:nsbm_navi_clear/theme/styled_colors.dart';
 import 'package:nsbm_navi_clear/ui/home_page/home_page_view.dart';
 import 'package:nsbm_navi_clear/ui/login_page/login_page_view.dart';
@@ -170,8 +171,13 @@ class _SignUpPageViewState extends State<SignUpPageView> {
         setState(() {
           isLoading = true;
         });
-        UserCredential? result =
-            await Auth().emailPasswordSignup(email, password);
+        UserCredential? result = await Auth().emailPasswordSignup(
+            email,
+            password,
+            Profile(
+                email: email,
+                displayName: name,
+                profilePicture: ""));
         setState(() {
           isLoading = false;
         });

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "363552371058-v0nig767usg4mcqtfco7mgdg8g9s5u7o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nsbm.naviclear.nsbm_navi_clear",
+            "certificate_hash": "a99f89cda2c6391aeebc755abc91db7c03a6e9a5"
+          }
+        },
+        {
           "client_id": "363552371058-muapqfdcrkg6tfpug04oa9gr24u2k58i.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -107,7 +107,7 @@ class _HomePageViewState extends State<HomePageView> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        selectedItemColor: Colors.blue[500],
         backgroundColor: Colors.white,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,

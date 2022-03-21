@@ -10,6 +10,10 @@ class RootBloc extends Bloc<RootEvent, RootState> {
   @override
   Stream<RootState> mapEventToState(RootEvent event) async* {
     switch (event.runtimeType) {
+      case SearchCategory:
+        final data = event as SearchCategory;
+        yield state.clone(query: data.query);
+        break;
     }
   }
 }

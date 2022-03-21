@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nsbm_navi_clear/db/auth.dart';
 import 'package:nsbm_navi_clear/theme/styled_colors.dart';
 import 'package:nsbm_navi_clear/ui/home_page/sub_pages/category_view.dart';
@@ -7,6 +8,8 @@ import 'package:nsbm_navi_clear/ui/home_page/sub_pages/profile_view.dart';
 import 'package:nsbm_navi_clear/ui/login_page/login_page_view.dart';
 import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
 
+import '../root_page/root_bloc.dart';
+import '../root_page/root_event.dart';
 import 'sub_pages/navigation_view.dart';
 
 class HomePageView extends StatefulWidget {
@@ -22,7 +25,7 @@ class _HomePageViewState extends State<HomePageView> {
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-    CategoryView(name),
+    CategoryView(),
     const NavigationView(),
     const FavouriteView(),
     const ProfileView(),
@@ -36,6 +39,8 @@ class _HomePageViewState extends State<HomePageView> {
 
   @override
   Widget build(BuildContext context) {
+    final rootBloc = BlocProvider.of<RootBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -53,9 +58,7 @@ class _HomePageViewState extends State<HomePageView> {
                       color: Colors.white,
                       child: TextField(
                         onChanged: (v) {
-                          setState(() {
-                            name = v;
-                          });
+                          rootBloc.add(SearchCategory(v));
                         },
                         decoration: const InputDecoration(
                             border: InputBorder.none, hintText: 'Search'),
@@ -68,25 +71,26 @@ class _HomePageViewState extends State<HomePageView> {
                   child: Container(),
                 ),
           actions: [
-            _selectedIndex != 0 ? GestureDetector(
-                onTap: () {
-                  Auth().logout();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginPageView()),
-                  );
-                },
-                child: const AppBarAction()) :
-            Padding(
-               padding: const EdgeInsets.only(right: 10.0),
-               child: InkWell(
-                 onTap: (){},
-                  child: const Icon(
-                    Icons.search,
-                    color: StyledColor.blurPrimary,
-                  )),
-             )
+            _selectedIndex != 0
+                ? GestureDetector(
+                    onTap: () {
+                      Auth().logout();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPageView()),
+                      );
+                    },
+                    child: const AppBarAction())
+                : Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: InkWell(
+                        onTap: () {},
+                        child: const Icon(
+                          Icons.search,
+                          color: StyledColor.blurPrimary,
+                        )),
+                  )
           ],
           leading: const AppBarLogo()),
       body: Center(

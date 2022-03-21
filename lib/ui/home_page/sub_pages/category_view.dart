@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nsbm_navi_clear/theme/styled_colors.dart';
 import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
 
+import '../../root_page/root_bloc.dart';
+import '../../root_page/root_state.dart';
+
 class CategoryView extends StatefulWidget {
-  String name = "";
-  CategoryView(String nm, {Key? key}) : super(key: key) {
-    name = nm;
-  }
+  CategoryView({Key? key}) : super(key: key) {}
 
   @override
   State<CategoryView> createState() => _CategoryViewState();
@@ -69,14 +70,23 @@ class _CategoryViewState extends State<CategoryView> {
 
   @override
   Widget build(BuildContext context) {
-    print("build...");
-    print(widget.name);
-    final Stream<QuerySnapshot> _locationsStream = widget.name == ""
-        ? FirebaseFirestore.instance.collection('locations').snapshots()
-        : FirebaseFirestore.instance
+    Stream<QuerySnapshot> _locationsStream =
+        FirebaseFirestore.instance.collection('locations').snapshots();
+
+    getCategories(String query) async {
+      if (query == "") {
+        _locationsStream =
+            FirebaseFirestore.instance.collection('locations').snapshots();
+      } else {
+        _locationsStream = FirebaseFirestore.instance
             .collection('locations')
-            .where('name', isGreaterThanOrEqualTo: widget.name)
+            .where(
+              'name',
+              isGreaterThanOrEqualTo: query.toUpperCase(),
+            )
             .snapshots();
+      }
+    }
 
     SizedBox getSubLocationView() {
       return SizedBox(
@@ -158,46 +168,52 @@ class _CategoryViewState extends State<CategoryView> {
 
     return isSubCategoryView
         ? getSubLocationView()
-        : StreamBuilder<QuerySnapshot>(
-            stream: _locationsStream,
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: StyledColor.blurPrimary,
-                  ),
-                );
-              }
-              if (snapshot.hasError) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Something went wrong...'),
-                  backgroundColor: Colors.redAccent,
-                ));
-              }
-              return ListView(
-                children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                  Map<String, dynamic> data =
-                      document.data()! as Map<String, dynamic>;
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        items = data["items"];
-                        name = data["name"];
-                        isSubCategoryView = true;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: getCategory(
-                        context,
-                        "${data["image"]}",
-                        "${data["name"]}",
-                      ),
-                    ),
-                  );
-                }).toList(),
-              );
+        : BlocBuilder<RootBloc, RootState>(
+            buildWhen: (pre, current) => pre.query != current.query,
+            builder: (context, state) {
+              getCategories(state.query);
+              return StreamBuilder<QuerySnapshot>(
+                  stream: _locationsStream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: StyledColor.blurPrimary,
+                        ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Something went wrong...'),
+                        backgroundColor: Colors.redAccent,
+                      ));
+                    }
+                    return ListView(
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                            document.data()! as Map<String, dynamic>;
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              items = data["items"];
+                              name = data["name"];
+                              isSubCategoryView = true;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: getCategory(
+                              context,
+                              "${data["image"]}",
+                              "${data["name"]}",
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  });
             });
   }
 }

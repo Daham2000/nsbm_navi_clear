@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'ui/root_page/root_page_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'ui/root_page/root_bloc.dart';
+import 'ui/root_page/root_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,14 +15,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Navi clear',
+    final materialApp = MaterialApp(
+      title: 'Navi Clear',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const RootView()
+      home: RootProvider(),
+    );
+
+    return MultiBlocProvider(
+      providers: <BlocProvider>[
+        BlocProvider<RootBloc>(create: (context) => RootBloc(context)),
+      ],
+      child: materialApp,
     );
   }
 }
-

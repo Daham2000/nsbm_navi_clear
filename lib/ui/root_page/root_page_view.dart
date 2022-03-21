@@ -38,7 +38,6 @@ class _RootViewState extends State<RootView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     checkLogin();
   }

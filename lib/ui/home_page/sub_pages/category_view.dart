@@ -1,13 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nsbm_navi_clear/theme/styled_colors.dart';
+import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
 
 class CategoryView extends StatefulWidget {
-  const CategoryView({Key? key}) : super(key: key);
+  String name = "";
+  CategoryView(String nm, {Key? key}) : super(key: key) {
+    name = nm;
+  }
 
   @override
   State<CategoryView> createState() => _CategoryViewState();
 }
 
 class _CategoryViewState extends State<CategoryView> {
+  bool isSubCategoryView = false;
+
+  String name = "";
+
   Container getCategory(BuildContext context, String img, String text) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
@@ -25,60 +35,169 @@ class _CategoryViewState extends State<CategoryView> {
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () {},
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Image(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  height: 120.0,
-                  fit: BoxFit.fill,
-                  image: NetworkImage(img)),
-              Container(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image(
                 width: MediaQuery.of(context).size.width * 0.9,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: SizedBox(
-                    height: 30,
-                    child: Text(
-                      text,
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.center,
-                      style:
-                          const TextStyle(fontSize: 20.0, color: Colors.black),
-                    ),
+                height: 120.0,
+                fit: BoxFit.fill,
+                image: NetworkImage(img)),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: SizedBox(
+                  height: 30,
+                  child: Text(
+                    text,
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 20.0, color: Colors.black),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );
   }
 
+  List<dynamic> items = [];
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListView(
-        children: [
-          getCategory(
-              context,
-              "https://firebasestorage.googleapis.com/v0/b/navi-clear.appspot.com/o/1212.jpeg?alt=media&token=84c25d6d-8238-4a93-b888-0703f4bbd6f8",
-              "NSBM - SOC"),
-          getCategory(
-              context,
-              "https://firebasestorage.googleapis.com/v0/b/navi-clear.appspot.com/o/intro-image.jpeg?alt=media&token=fe313b7f-40c1-493c-98e7-2878f154c6d4",
-              "One Galle Face"),
-          getCategory(
-              context,
-              "https://firebasestorage.googleapis.com/v0/b/navi-clear.appspot.com/o/DSC03113-e1492752901317.jpeg?alt=media&token=bc2f42d9-4a79-4db9-ad65-d3bc9ef4abd8",
-              "Colombo South Teaching Hospital"),
-        ],
-      ),
-    );
+    print("build...");
+    print(widget.name);
+    final Stream<QuerySnapshot> _locationsStream = widget.name == ""
+        ? FirebaseFirestore.instance.collection('locations').snapshots()
+        : FirebaseFirestore.instance
+            .collection('locations')
+            .where('name', isGreaterThanOrEqualTo: widget.name)
+            .snapshots();
+
+    SizedBox getSubLocationView() {
+      return SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Scrollbar(
+          thickness: 0,
+          child: ListView(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isSubCategoryView = false;
+                      });
+                    },
+                    child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      child: Icon(Icons.arrow_back_ios),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              Column(
+                children: [
+                  for (var i in items)
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      margin: const EdgeInsets.symmetric(vertical: 7.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            i["name"],
+                            style: const TextStyle(
+                                fontSize: 18.0, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.start,
+                          ),
+                          i["superSubitems"] == null
+                              ? SubCategory(i, name, [])
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    for (var s in i["superSubitems"])
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            s["title"],
+                                            style: const TextStyle(
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.w400),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                          SubCategory(s, name, [])
+                                        ],
+                                      ),
+                                  ],
+                                )
+                        ],
+                      ),
+                    )
+                ],
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
+    return isSubCategoryView
+        ? getSubLocationView()
+        : StreamBuilder<QuerySnapshot>(
+            stream: _locationsStream,
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: StyledColor.blurPrimary,
+                  ),
+                );
+              }
+              if (snapshot.hasError) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Something went wrong...'),
+                  backgroundColor: Colors.redAccent,
+                ));
+              }
+              return ListView(
+                children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                  Map<String, dynamic> data =
+                      document.data()! as Map<String, dynamic>;
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        items = data["items"];
+                        name = data["name"];
+                        isSubCategoryView = true;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: getCategory(
+                        context,
+                        "${data["image"]}",
+                        "${data["name"]}",
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            });
   }
 }

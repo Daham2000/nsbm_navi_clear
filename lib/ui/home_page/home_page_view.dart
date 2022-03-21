@@ -16,16 +16,16 @@ class HomePageView extends StatefulWidget {
   State<HomePageView> createState() => _HomePageViewState();
 }
 
+String name = "";
+
 class _HomePageViewState extends State<HomePageView> {
   int _selectedIndex = 0;
 
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Scrollbar(child: CategoryView()),
-    NavigationView(),
-    FavouriteView(),
-    ProfileView(),
+  static final List<Widget> _widgetOptions = <Widget>[
+    CategoryView(name),
+    const NavigationView(),
+    const FavouriteView(),
+    const ProfileView(),
   ];
 
   void _onItemTapped(int index) {
@@ -51,8 +51,13 @@ class _HomePageViewState extends State<HomePageView> {
                     child: Container(
                       alignment: Alignment.centerLeft,
                       color: Colors.white,
-                      child: const TextField(
-                        decoration: InputDecoration(
+                      child: TextField(
+                        onChanged: (v) {
+                          setState(() {
+                            name = v;
+                          });
+                        },
+                        decoration: const InputDecoration(
                             border: InputBorder.none, hintText: 'Search'),
                       ),
                     ),

@@ -10,6 +10,7 @@ import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
 
 import '../root_page/root_bloc.dart';
 import '../root_page/root_event.dart';
+import '../root_page/root_state.dart';
 import 'sub_pages/navigation_view.dart';
 
 class HomePageView extends StatefulWidget {
@@ -41,86 +42,90 @@ class _HomePageViewState extends State<HomePageView> {
   Widget build(BuildContext context) {
     final rootBloc = BlocProvider.of<RootBloc>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          leadingWidth: 110,
-          elevation: 0,
-          title: _selectedIndex == 0
-              ? PreferredSize(
-                  preferredSize: const Size(200, 50),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 12.0),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      color: Colors.white,
-                      child: TextField(
-                        onChanged: (v) {
-                          rootBloc.add(SearchCategory(v));
-                        },
-                        decoration: const InputDecoration(
-                            border: InputBorder.none, hintText: 'Search'),
+    return BlocBuilder<RootBloc, RootState>(
+        buildWhen: (pre, current) => pre.query != current.query,
+        builder: (context, state) {
+          return Scaffold(
+            appBar: AppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.white,
+                leadingWidth: 110,
+                elevation: 0,
+                title: _selectedIndex == 0
+                    ? PreferredSize(
+                        preferredSize: const Size(200, 50),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 12.0),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            color: Colors.white,
+                            child: TextField(
+                              onChanged: (v) {
+                                rootBloc.add(SearchCategory(v));
+                              },
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none, hintText: 'Search'),
+                            ),
+                          ),
+                        ),
+                      )
+                    : PreferredSize(
+                        preferredSize: const Size(200, 0),
+                        child: Container(),
                       ),
-                    ),
-                  ),
-                )
-              : PreferredSize(
-                  preferredSize: const Size(200, 0),
-                  child: Container(),
+                actions: [
+                  _selectedIndex != 0
+                      ? GestureDetector(
+                          onTap: () {
+                            Auth().logout();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPageView()),
+                            );
+                          },
+                          child: const AppBarAction())
+                      : Padding(
+                          padding: const EdgeInsets.only(right: 10.0),
+                          child: InkWell(
+                              onTap: () {},
+                              child: const Icon(
+                                Icons.search,
+                                color: StyledColor.blurPrimary,
+                              )),
+                        )
+                ],
+                leading: const AppBarLogo()),
+            body: Center(
+              child: _widgetOptions.elementAt(_selectedIndex),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.category),
+                  label: 'Category',
                 ),
-          actions: [
-            _selectedIndex != 0
-                ? GestureDetector(
-                    onTap: () {
-                      Auth().logout();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPageView()),
-                      );
-                    },
-                    child: const AppBarAction())
-                : Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: InkWell(
-                        onTap: () {},
-                        child: const Icon(
-                          Icons.search,
-                          color: StyledColor.blurPrimary,
-                        )),
-                  )
-          ],
-          leading: const AppBarLogo()),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Category',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.navigation),
-            label: 'Navigation',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorite',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue[500],
-        backgroundColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
-    );
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.navigation),
+                  label: 'Navigation',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.favorite),
+                  label: 'Favorite',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: 'Profile',
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: Colors.blue[500],
+              backgroundColor: Colors.white,
+              unselectedItemColor: Colors.grey,
+              onTap: _onItemTapped,
+            ),
+          );
+        });
   }
 }

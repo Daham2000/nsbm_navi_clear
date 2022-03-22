@@ -13,4 +13,15 @@ class LocationApi {
     }
     await locations.doc(doc.id).update({'favList': favList, "isFav": true});
   }
+
+  Future getNavigation(String fromWhere,String toWhere)async{
+    final QuerySnapshot _navigationStream = await FirebaseFirestore.instance
+        .collection('navigations')
+        .where('fromWhere', isEqualTo: fromWhere)
+        .where('toWhere', isEqualTo: toWhere).get();
+    if(_navigationStream.docs.isNotEmpty){
+      final doc = _navigationStream.docs.first;
+      return doc;
+    }
+  }
 }

@@ -12,7 +12,12 @@ class RootBloc extends Bloc<RootEvent, RootState> {
     switch (event.runtimeType) {
       case SearchCategory:
         final data = event as SearchCategory;
-        yield state.clone(query: data.query);
+        yield state.clone(query: data.query, toWhere: '');
+        break;
+
+      case NavigateFromWhere:
+        final data = event as NavigateFromWhere;
+        yield state.clone(query: '', toWhere: data.toWhere);
         break;
     }
   }

@@ -8,3 +8,9 @@ class SearchCategory extends RootEvent {
 
   SearchCategory(this.query);
 }
+
+class NavigateFromWhere extends RootEvent {
+  final String toWhere;
+
+  NavigateFromWhere(this.toWhere);
+}

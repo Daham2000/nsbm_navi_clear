@@ -25,7 +25,7 @@ class _LoginPageViewState extends State<LoginPageView> {
   final passCtrl = TextEditingController();
   bool isLoading = false;
 
-  checkAlreadyLoggedIn()async{
+  checkAlreadyLoggedIn() async {
     final User? user = await Auth().getLoggedUser();
     if (user != null) {
       Navigator.pushReplacement(
@@ -37,7 +37,6 @@ class _LoginPageViewState extends State<LoginPageView> {
 
   @override
   Widget build(BuildContext context) {
-
     final emailField = TextFormField(
       controller: emailCtrl,
       validator: (value) {
@@ -129,19 +128,28 @@ class _LoginPageViewState extends State<LoginPageView> {
       final email = (emailCtrl.text).trim();
       final password = (passCtrl.text).trim();
       if (EmailValidator.validate(email)) {
-        setState(() {
-          isLoading = true;
-        });
-        UserCredential? result =
-            await Auth().emailPasswordLogin(email, password);
-        setState(() {
-          isLoading = false;
-        });
-        if (result.user != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePageView()),
-          );
+        try {
+          setState(() {
+            isLoading = true;
+          });
+          UserCredential? result =
+              await Auth().emailPasswordLogin(email, password);
+
+          if (result.user != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePageView()),
+            );
+          }
+        } catch (e) {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("The email or password is incorrect"),
+            backgroundColor: StyledColor.googleBtn,
+          ));
+          return;
         }
       } else {
         return;

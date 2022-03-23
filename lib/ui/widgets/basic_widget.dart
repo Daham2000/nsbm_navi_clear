@@ -148,7 +148,9 @@ class SubCategory extends StatelessWidget {
                           Row(
                             children: [
                               InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  rootBloc.add(NavigateFromWhere(t));
+                                },
                                 child: const Icon(
                                   Icons.navigation,
                                   color: StyledColor.blurPrimary,

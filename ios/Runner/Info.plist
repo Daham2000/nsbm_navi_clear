@@ -43,5 +43,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.363552371058-k9euq2002m7d08mtpddb0tbakmk1ms2s</string>
+            </array>
+        </dict>
+    </array>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Photo Library Access Warning</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Allow the app to record using your phone's microphone</string>
+    <key>NSCameraUsageDescription</key>
+    <string>To capture profile photo please grant camera access</string>
 </dict>
 </plist>

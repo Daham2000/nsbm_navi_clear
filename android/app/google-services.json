@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "363552371058",
+    "project_id": "navi-clear",
+    "storage_bucket": "navi-clear.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:363552371058:android:90faa95bc7c47c862e2deb",
+        "android_client_info": {
+          "package_name": "com.nsbm.naviclear.nsbm_navi_clear"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "363552371058-v0nig767usg4mcqtfco7mgdg8g9s5u7o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nsbm.naviclear.nsbm_navi_clear",
+            "certificate_hash": "a99f89cda2c6391aeebc755abc91db7c03a6e9a5"
+          }
+        },
+        {
+          "client_id": "363552371058-muapqfdcrkg6tfpug04oa9gr24u2k58i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByOEOJBNg5basVEuGYyw_eckEmyXaNFkg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "363552371058-muapqfdcrkg6tfpug04oa9gr24u2k58i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "363552371058-k9euq2002m7d08mtpddb0tbakmk1ms2s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nsbm.naviclear.nsbmNaviClear"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

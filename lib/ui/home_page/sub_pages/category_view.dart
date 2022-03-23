@@ -1,13 +1,24 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nsbm_navi_clear/theme/styled_colors.dart';
+import 'package:nsbm_navi_clear/ui/widgets/basic_widget.dart';
+
+import '../../root_page/root_bloc.dart';
+import '../../root_page/root_state.dart';
 
 class CategoryView extends StatefulWidget {
-  const CategoryView({Key? key}) : super(key: key);
+  CategoryView({Key? key}) : super(key: key) {}
 
   @override
   State<CategoryView> createState() => _CategoryViewState();
 }
 
 class _CategoryViewState extends State<CategoryView> {
+  bool isSubCategoryView = false;
+
+  String name = "";
+
   Container getCategory(BuildContext context, String img, String text) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
@@ -25,63 +36,184 @@ class _CategoryViewState extends State<CategoryView> {
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () {},
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Image(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  height: 120.0,
-                  fit: BoxFit.fill,
-                  image: NetworkImage(img)),
-              Container(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image(
                 width: MediaQuery.of(context).size.width * 0.9,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: SizedBox(
-                    height: 30,
-                    child: Text(
-                      text,
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.center,
-                      style:
-                          const TextStyle(fontSize: 20.0, color: Colors.black),
-                    ),
+                height: 120.0,
+                fit: BoxFit.fill,
+                image: NetworkImage(img)),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: SizedBox(
+                  height: 30,
+                  child: Text(
+                    text,
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 20.0, color: Colors.black),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );
   }
 
+  List<dynamic> items = [];
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          getCategory(
-              context,
-              "http://i1.wp.com/securityaffairs.co/wordpress/"
-                  "wp-content/uploads/2016/05/soc-Security-Operations-Center."
-                  "png?resize=300185",
-              "NSBM - SOC"),
-          getCategory(
-              context,
-              "https://www.onegalleface.com/wp-content/themes/ogf/img/intro-image.jpg",
-              "One Galle Face"),
-          getCategory(
-              context,
-              "https://www.csth.health.gov.lk/wp-content/uploads/2015/07/DSC03113-e1492752901317.jpg",
-              "Colombo South Teaching Hospital"),
-        ],
-      ),
-    );
+    Stream<QuerySnapshot> _locationsStream =
+        FirebaseFirestore.instance.collection('locations').snapshots();
+
+    getCategories(String query) async {
+      if (query == "") {
+        _locationsStream =
+            FirebaseFirestore.instance.collection('locations').snapshots();
+      } else {
+        _locationsStream = FirebaseFirestore.instance
+            .collection('locations')
+            .where(
+              'name',
+              isGreaterThanOrEqualTo: query.toUpperCase(),
+            )
+            .snapshots();
+      }
+    }
+
+    SizedBox getSubLocationView() {
+      return SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Scrollbar(
+          thickness: 0,
+          child: ListView(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isSubCategoryView = false;
+                      });
+                    },
+                    child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      child: Icon(Icons.arrow_back_ios),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              Column(
+                children: [
+                  for (var i in items)
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      margin: const EdgeInsets.symmetric(vertical: 7.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            i["name"],
+                            style: const TextStyle(
+                                fontSize: 18.0, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.start,
+                          ),
+                          i["superSubitems"] == null
+                              ? SubCategory(i, name, [])
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(
+                                      height: 20,
+                                    ),
+                                    for (var s in i["superSubitems"])
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            s["title"],
+                                            style: const TextStyle(
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.w400),
+                                            textAlign: TextAlign.start,
+                                          ),
+                                          SubCategory(s, name, [])
+                                        ],
+                                      ),
+                                  ],
+                                )
+                        ],
+                      ),
+                    )
+                ],
+              )
+            ],
+          ),
+        ),
+      );
+    }
+
+    return isSubCategoryView
+        ? getSubLocationView()
+        : BlocBuilder<RootBloc, RootState>(
+            buildWhen: (pre, current) => pre.query != current.query,
+            builder: (context, state) {
+              getCategories(state.query);
+              return StreamBuilder<QuerySnapshot>(
+                  stream: _locationsStream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: StyledColor.blurPrimary,
+                        ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Something went wrong...'),
+                        backgroundColor: Colors.redAccent,
+                      ));
+                    }
+                    return ListView(
+                      children:
+                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                            document.data()! as Map<String, dynamic>;
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              items = data["items"];
+                              name = data["name"];
+                              isSubCategoryView = true;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: getCategory(
+                              context,
+                              "${data["image"]}",
+                              "${data["name"]}",
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  });
+            });
   }
 }

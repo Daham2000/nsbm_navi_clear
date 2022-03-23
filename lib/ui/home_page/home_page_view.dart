@@ -24,7 +24,7 @@ String name = "";
 
 class _HomePageViewState extends State<HomePageView> {
   int _selectedIndex = 0;
-
+  late RootBloc rootBloc;
   static final List<Widget> _widgetOptions = <Widget>[
     CategoryView(),
     const NavigationView(),
@@ -32,7 +32,14 @@ class _HomePageViewState extends State<HomePageView> {
     const ProfileView(),
   ];
 
+  @override
+  void initState() {
+    rootBloc = BlocProvider.of<RootBloc>(context);
+    super.initState();
+  }
+
   void _onItemTapped(int index) {
+    rootBloc.add(SearchCategory(""));
     setState(() {
       _selectedIndex = index;
     });
@@ -43,8 +50,14 @@ class _HomePageViewState extends State<HomePageView> {
     final rootBloc = BlocProvider.of<RootBloc>(context);
 
     return BlocBuilder<RootBloc, RootState>(
-        buildWhen: (pre, current) => pre.query != current.query,
+        buildWhen: (pre, current) => pre.query != current.query ||
+            pre.toWhere != current.toWhere,
         builder: (context, state) {
+          if(state.toWhere!=''){
+            if(state.isSelectedAgain==false){
+              _selectedIndex = 1;
+            }
+          }
           return Scaffold(
             appBar: AppBar(
                 automaticallyImplyLeading: false,

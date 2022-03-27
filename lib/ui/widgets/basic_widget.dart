@@ -38,7 +38,7 @@ class AppBarLogo extends StatelessWidget {
             "NaviClear",
             style: TextStyle(
               color: StyledColor.blurPrimary,
-              fontSize: 16.0,
+              fontSize: 20.0,
             ),
           ),
         ],

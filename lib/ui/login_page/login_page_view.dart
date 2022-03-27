@@ -318,7 +318,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                     child: Text(
-                      "Don't you have a account? Signup",
+                      "Don't you have an account? Signup",
                       style: TextStyle(fontSize: 14),
                       textAlign: TextAlign.center,
                     ),

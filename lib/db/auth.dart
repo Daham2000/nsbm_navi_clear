@@ -47,6 +47,7 @@ class Auth {
   }
 
   Future<void> logout() async {
+    await GoogleSignIn().signOut();
     await auth.signOut();
   }
 
@@ -58,12 +59,12 @@ class Auth {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
       final GoogleSignInAuthentication? googleAuth =
           await googleUser?.authentication;
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
-      final u = await users.where('email', isNotEqualTo: googleUser?.email).get();
+      print(googleUser?.email);
+      final u = await users.where('email', isEqualTo: googleUser?.email).get();
       if(u.docs.isEmpty){
         await users
             .add({

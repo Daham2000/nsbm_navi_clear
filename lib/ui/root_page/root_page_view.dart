@@ -19,8 +19,12 @@ class _RootViewState extends State<RootView> {
   bool isLoading = true;
 
   void checkLogin()async{
+    setState(() {
+      isLoading = true;
+    });
     final User? user = await Auth().getLoggedUser();
     if(user!=null){
+      await Future.delayed(const Duration(seconds: 5));
       setState(() {
         isLoading = false;
       });
@@ -52,9 +56,9 @@ class _RootViewState extends State<RootView> {
         children: [
           Image.asset(
             Assets.logo,
-            height: 60,
+            height: 30,
           ),
-          const SizedBox(height: 7.0,),
+          const SizedBox(height: 25.0,),
           const CircularProgressIndicator(
             color: StyledColor.blurPrimary,
           ),

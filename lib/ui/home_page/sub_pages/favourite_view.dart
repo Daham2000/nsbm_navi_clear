@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../../db/location_api.dart';
 import '../../../theme/styled_colors.dart';
 import '../../widgets/basic_widget.dart';
 

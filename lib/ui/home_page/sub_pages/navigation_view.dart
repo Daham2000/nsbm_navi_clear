@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:nsbm_navi_clear/db/location_api.dart';
 
 import '../../root_page/root_bloc.dart';
+import '../../root_page/root_event.dart';
 import '../../root_page/root_state.dart';
 
 class NavigationView extends StatefulWidget {
@@ -17,9 +18,11 @@ class NavigationView extends StatefulWidget {
 String fromWhere = "";
 
 class _NavigationViewState extends State<NavigationView> {
+  late RootBloc rootBloc;
 
   @override
   void initState() {
+    rootBloc = BlocProvider.of<RootBloc>(context);
     super.initState();
   }
   String _fromWhere = "";
@@ -46,6 +49,10 @@ class _NavigationViewState extends State<NavigationView> {
           _toWhere = state.toWhereList[0];
         }
         if (state.toWhere != "") {
+          List<String> toWhereList = state.toWhereList;
+          List<String> fromWhereList = state.fromWhereList;
+          toWhereList.add(state.toWhere);
+          rootBloc.add(InitEvent(fromWhereList, toWhereList));
           if (state.toWhereList.contains(state.toWhere)) {
             _toWhere = state.toWhere;
           }else{
@@ -133,6 +140,7 @@ class _NavigationViewState extends State<NavigationView> {
             ),
             InkWell(
               onTap: () async {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 if (_fromWhere != "") {
                   final doc =
                       await LocationApi().getNavigation(_fromWhere, _toWhere);
